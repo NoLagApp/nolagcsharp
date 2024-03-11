@@ -11,7 +11,9 @@ namespace NoLagClient.Communication;
 ///         Functionalities
 ///             -> Publish message to topic
 ///             -> Receive message for topic
-///        
+///
+/// Note: This class will utilize the client to connect with websocket.
+/// It has the awareness about topic 
 /// </summary>
 public interface INolagTunnel
 {
