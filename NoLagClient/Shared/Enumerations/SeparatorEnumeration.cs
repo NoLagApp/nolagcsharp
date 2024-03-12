@@ -8,4 +8,6 @@ public class SeparatorEnumeration(int id, string name, int separatorAscii) : Enu
     public static SeparatorEnumeration Vertical = new SeparatorEnumeration(3, nameof(Vertical), 11);
     public static SeparatorEnumeration NegativeAck = new SeparatorEnumeration(4, nameof(NegativeAck), 21);
     public static SeparatorEnumeration BellAlert = new SeparatorEnumeration(5, nameof(BellAlert), 7);
+
+    public readonly int SeparatorAscii = separatorAscii;
 }

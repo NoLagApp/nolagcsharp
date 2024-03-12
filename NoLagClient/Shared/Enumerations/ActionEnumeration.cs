@@ -4,4 +4,6 @@ public class ActionEnumeration(int id, string name, string actionKey) : Enumerat
 {
     public static ActionEnumeration Add = new ActionEnumeration(0, nameof(Add), "a");
     public static ActionEnumeration Delete = new ActionEnumeration(1, nameof(Delete), "d");
+
+    public readonly string ActionKey = actionKey;
 }

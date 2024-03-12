@@ -10,48 +10,48 @@ namespace NoLagClient.Communication;
  */
 public class Client
 {
-    private string host;
-    private string authToken;
+    private string _host;
+    private string _authToken;
     public object wsInstance = null;
-    private string protocol;
-    private string url;
-    private string deviceConnectionId = null;
+    private string _protocol;
+    private string _url;
+    private string _deviceConnectionId = null;
 
     public string deviceTokenId = null;
 
     //  check connection
-    private int defaultCheckConnectionInterval = 100;
-    private int defaultCheckConnectionTimeout = 10000;
-    private int checkConnectionInterval;
-    private int checkConnectionTimeout;
+    private int _defaultCheckConnectionInterval = 100;
+    private int _defaultCheckConnectionTimeout = 10000;
+    private int _checkConnectionInterval;
+    private int _checkConnectionTimeout;
 
     // The following funcs take in 
     // 1. string: message coming from server (if any)
     // return: a task so we can make the func async
-    private Func<string?, Task> callbackOnOpenAsync;
-    private Func<string?, Task> callbackOnReceiveAsync;
-    private Func<string?, Task> callbackOnCloseAsync;
-    private Func<string?, Task> callbackOnErrorAsync;
+    private Func<string?, Task> _callbackOnOpenAsync;
+    private Func<string?, Task> _callbackOnReceiveAsync;
+    private Func<string?, Task> _callbackOnCloseAsync;
+    private Func<string?, Task> _callbackOnErrorAsync;
 
     // TODO: Need a way to clean up this resource on 
     // Close
     // Error
     private ClientWebSocket _clientWebSocket;
 
-    private ConnectionStatusEnumeration connectionStatus = ConnectionStatusEnumeration.Idle;
+    private ConnectionStatusEnumeration _connectionStatus = ConnectionStatusEnumeration.Idle;
 
     public Client(string authToken, ConnectOptions? connectOptions)
     {
-        this.authToken = authToken ?? "";
-        this.host = connectOptions?.Host ?? Constants.DefaultWsHost;
-        this.protocol = connectOptions?.Protocol ?? Constants.DefaultWsProtocol;
-        this.url = Constants.DefaultWsUrl;
-        this.checkConnectionInterval =
+        this._authToken = authToken ?? "";
+        this._host = connectOptions?.Host ?? Constants.DefaultWsHost;
+        this._protocol = connectOptions?.Protocol ?? Constants.DefaultWsProtocol;
+        this._url = Constants.DefaultWsUrl;
+        this._checkConnectionInterval =
             connectOptions?.CheckConnectionInterval ??
-            this.defaultCheckConnectionInterval;
-        this.checkConnectionTimeout =
+            this._defaultCheckConnectionInterval;
+        this._checkConnectionTimeout =
             connectOptions?.CheckConnectionTimeout ??
-            this.defaultCheckConnectionTimeout;
+            this._defaultCheckConnectionTimeout;
     }
 
     /**
@@ -62,12 +62,12 @@ public class Client
      */
     public async Task ConnectAndListenToMessages(CancellationToken cancellationToken)
     {
-        this.connectionStatus = ConnectionStatusEnumeration.Idle;
+        this._connectionStatus = ConnectionStatusEnumeration.Idle;
         // Replace the WebSocket URL with the appropriate server address
-        string webSocketUrl = $"{this.protocol}://{this.host}";
+        string webSocketUrl = $"{this._protocol}://{this._host}";
 
         // avoid initiate
-        if (Equals(this.connectionStatus, ConnectionStatusEnumeration.Connected))
+        if (Equals(this._connectionStatus, ConnectionStatusEnumeration.Connected))
         {
             return;
         }
@@ -77,7 +77,7 @@ public class Client
         await _clientWebSocket.ConnectAsync(new Uri(webSocketUrl), cancellationToken);
 
         // Invoke lister on successfully connected
-        await this.callbackOnOpenAsync(null);
+        await this._callbackOnOpenAsync(null);
 
         // Start a separate thread to handle incoming messages
         _ = Task.Run(() => this.ReceiveMessage(this._clientWebSocket, cancellationToken));
@@ -86,7 +86,7 @@ public class Client
         // string message = "Hello, WebSocket server!";
         // await SendMessage(_clientWebSocket, message);
     }
-
+    
     private async Task ReceiveMessage(ClientWebSocket webSocket, CancellationToken cancellationToken)
     {
         byte[] buffer = new byte[1024];
@@ -100,7 +100,7 @@ public class Client
             {
                 string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 Console.WriteLine($"Received message: {receivedMessage}");
-                await this.callbackOnReceiveAsync(receivedMessage);
+                await this._callbackOnReceiveAsync(receivedMessage);
             }
             else if (result.MessageType == WebSocketMessageType.Close)
             {
